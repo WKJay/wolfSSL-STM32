@@ -155,7 +155,7 @@
             #ifdef __PPU
                 #include <netex/errno.h>
             #else
-                #include <sys/ioctl.h>
+                //#include <sys/ioctl.h>
             #endif
         #endif
     #endif

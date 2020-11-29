@@ -2,7 +2,7 @@
 #define __WOLFSSL_WOLFSSL_CONF_H__
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -19,7 +19,7 @@
 #define WOLF_CONF_WOLFCRYPT_ONLY      0
 
 /*---------- WOLF_CONF_TLS13 -----------*/
-#define WOLF_CONF_TLS13      1
+#define WOLF_CONF_TLS13      0
 
 /*---------- WOLF_CONF_TLS12 -----------*/
 #define WOLF_CONF_TLS12      1
@@ -31,7 +31,7 @@
 #define WOLF_CONF_MATH      1
 
 /*---------- WOLF_CONF_RTOS -----------*/
-#define WOLF_CONF_RTOS      2
+#define WOLF_CONF_RTOS      3
 
 /*---------- WOLF_CONF_RSA -----------*/
 #define WOLF_CONF_RSA      1
@@ -82,10 +82,10 @@
 #define WOLF_CONF_PWDBASED      0
 
 /*---------- WOLF_CONF_KEEP_PEER_CERT -----------*/
-#define WOLF_CONF_KEEP_PEER_CERT      0
+#define WOLF_CONF_KEEP_PEER_CERT      1
 
 /*---------- WOLF_CONF_BASE64_ENCODE -----------*/
-#define WOLF_CONF_BASE64_ENCODE      0
+#define WOLF_CONF_BASE64_ENCODE      1
 
 /*---------- WOLF_CONF_OPENSSL_EXTRA -----------*/
 #define WOLF_CONF_OPENSSL_EXTRA      0
@@ -93,6 +93,25 @@
 /*---------- WOLF_CONF_TEST -----------*/
 #define WOLF_CONF_TEST      0
 
+/*---------- USE RT-THREAD -----------*/
+#define RTT_CRYPTO_RAND_GENERATE
+
+#define DEBUG_WOLFSSL
+
+#define HAVE_PKCS7
+#define HAVE_AES_KEYWRAP
+#define WOLFSSL_AES_DIRECT
+#define HAVE_X963_KDF
+#define WOLFSSL_DER_TO_PEM
+#define WOLFSSL_CERT_GEN
+#define WOLFSSL_CERT_REQ
+#define WOLFSSL_KEY_GEN
+#define WOLFSSL_CERT_EXT
+//#define OPENSSL_ALL
+//#define SESSION_CERTS
+
+//#define HAVE_FIPS
+//#define HAVE_FIPS_VERSION 2
 /* ------------------------------------------------------------------------- */
 /* Hardware platform */
 /* ------------------------------------------------------------------------- */
@@ -118,7 +137,7 @@
     #undef  NO_STM32_HASH
     #undef  NO_STM32_CRYPTO
     #define STM32_HAL_V2
-    #define HAL_CONSOLE_UART huart2
+#define HAL_CONSOLE_UART huart2
 #elif defined(STM32H753xx)
     #define WOLFSSL_STM32H7
     #undef  NO_STM32_HASH
@@ -130,8 +149,8 @@
     #undef  NO_STM32_CRYPTO
     #define HAL_CONSOLE_UART hlpuart1
 #elif defined(STM32L475xx)
-    #define WOLFSSL_STM32L4
-    #define HAL_CONSOLE_UART huart1
+#define WOLFSSL_STM32L4
+#define HAL_CONSOLE_UART huart1
 #elif defined(STM32L562xx)
     #define WOLFSSL_STM32L5
     #define WOLFSSL_STM32_PKA
@@ -154,9 +173,19 @@
     #define HAL_CONSOLE_UART huart2
     #define NO_STM32_RNG
     #define WOLFSSL_GENSEED_FORTEST
+#elif defined(STM32H743xx)
+    #define WOLFSSL_STM32H7
+    #define HAL_CONSOLE_UART huart4
+    #define NO_STM32_RNG
+    #define WOLFSSL_GENSEED_FORTEST
+#elif defined(STM32H750xx)
+    #define WOLFSSL_STM32H7
+    #define HAL_CONSOLE_UART huart4
+    #define NO_STM32_RNG
+    #define WOLFSSL_GENSEED_FORTEST
 #else
-	#warning Please define a hardware platform!
-    //#define WOLFSSL_STM32F4 /* default */
+#warning Please define a hardware platform!
+    #define WOLFSSL_STM32F4 /* default */
     #define HAL_CONSOLE_UART huart4
 #endif
 
@@ -167,14 +196,16 @@
 #define WOLFSSL_GENERAL_ALIGNMENT 4
 #define WOLFSSL_STM32_CUBEMX
 #define WOLFSSL_SMALL_STACK
-#define WOLFSSL_USER_IO
-#define WOLFSSL_NO_SOCK
+// #define WOLFSSL_USER_IO
+// #define WOLFSSL_NO_SOCK
 #define WOLFSSL_IGNORE_FILE_WARN
 
 /* ------------------------------------------------------------------------- */
 /* Operating System */
 /* ------------------------------------------------------------------------- */
-#if defined(WOLF_CONF_RTOS) && WOLF_CONF_RTOS == 2
+#if defined(WOLF_CONF_RTOS) && WOLF_CONF_RTOS == 3
+    #define RTTHREAD
+#elif defined(WOLF_CONF_RTOS) && WOLF_CONF_RTOS == 2
     #define FREERTOS
 #else
     #define SINGLE_THREADED
@@ -185,16 +216,16 @@
 /* ------------------------------------------------------------------------- */
 /* 1=Fast, 2=Normal, 3=SP C, 4=SP Cortex-M */
 #if defined(WOLF_CONF_MATH) && WOLF_CONF_MATH != 2
-    /* fast (stack) math */
-    #define USE_FAST_MATH
-    #define TFM_TIMING_RESISTANT
+/* fast (stack) math */
+#define USE_FAST_MATH
+#define TFM_TIMING_RESISTANT
 
     /* Optimizations (TFM_ARM, TFM_ASM or none) */
     //#define TFM_NO_ASM
     //#define TFM_ASM
 #endif
 #if defined(WOLF_CONF_MATH) && (WOLF_CONF_MATH == 3 || WOLF_CONF_MATH == 4)
-    /* single precision only */
+/* single precision only */
     #define WOLFSSL_SP
     #define WOLFSSL_SP_SMALL      /* use smaller version of code */
     #define WOLFSSL_HAVE_SP_RSA
@@ -223,33 +254,33 @@
 #define HAVE_EXTENDED_MASTER
 
 #if defined(WOLF_CONF_TLS13) && WOLF_CONF_TLS13 == 1
-    #define WOLFSSL_TLS13
-    #define HAVE_HKDF
+#define WOLFSSL_TLS13
+#define HAVE_HKDF
 #endif
 #if defined(WOLF_CONF_DTLS) && WOLF_CONF_DTLS == 1
-    #define WOLFSSL_DTLS
+#define WOLFSSL_DTLS
 #endif
 #if defined(WOLF_CONF_PSK) && WOLF_CONF_PSK == 0
-    #define NO_PSK
+#define NO_PSK
 #endif
 #if defined(WOLF_CONF_PWDBASED) && WOLF_CONF_PWDBASED == 0
-    #define NO_PWDBASED
+#define NO_PWDBASED
 #endif
 #if defined(WOLF_CONF_KEEP_PEER_CERT) && WOLF_CONF_KEEP_PEER_CERT == 1
-    #define KEEP_PEER_CERT
+#define KEEP_PEER_CERT
 #endif
 #if defined(WOLF_CONF_BASE64_ENCODE) && WOLF_CONF_BASE64_ENCODE == 1
-    #define WOLFSSL_BASE64_ENCODE
+#define WOLFSSL_BASE64_ENCODE
 #endif
 #if defined(WOLF_CONF_OPENSSL_EXTRA) && WOLF_CONF_OPENSSL_EXTRA == 1
-    #define OPENSSL_EXTRA
+#define OPENSSL_EXTRA
 #endif
 
 /* TLS Session Cache */
 #if 0
-    #define SMALL_SESSION_CACHE
+#define SMALL_SESSION_CACHE
 #else
-    #define NO_SESSION_CACHE
+#define NO_SESSION_CACHE
 #endif
 
 /* ------------------------------------------------------------------------- */
@@ -259,7 +290,7 @@
 #undef NO_RSA
 #if defined(WOLF_CONF_RSA) && WOLF_CONF_RSA == 1
     #ifdef USE_FAST_MATH
-        /* Maximum math bits (Max RSA key bits * 2) */
+    /* Maximum math bits (Max RSA key bits * 2) */
         #undef  FP_MAX_BITS
         #define FP_MAX_BITS     4096
     #endif
@@ -274,7 +305,7 @@
 
     /* RSA PSS Support (required for TLS v1.3) */
     #ifdef WOLFSSL_TLS13
-        #define WC_RSA_PSS
+    #define WC_RSA_PSS
     #endif
 #else
     #define NO_RSA
@@ -294,35 +325,35 @@
     //#define HAVE_ECC384
     //#define HAVE_ECC521
 
-    /* Fixed point cache (speeds repeated operations against same private key) */
+/* Fixed point cache (speeds repeated operations against same private key) */
     #undef  FP_ECC
     //#define FP_ECC
     #ifdef FP_ECC
-        /* Bits / Entries */
+/* Bits / Entries */
         #undef  FP_ENTRIES
         #define FP_ENTRIES  2
         #undef  FP_LUT
         #define FP_LUT      4
-    #endif
+#endif
 
-    /* Optional ECC calculation method */
-    /* Note: doubles heap usage, but slightly faster */
+/* Optional ECC calculation method */
+/* Note: doubles heap usage, but slightly faster */
     #undef  ECC_SHAMIR
     #define ECC_SHAMIR
 
     /* Reduces heap usage, but slower */
     #define ECC_TIMING_RESISTANT
 
-    /* Compressed ECC key support */
-    //#define HAVE_COMP_KEY
+        /* Compressed ECC key support */
+        //#define HAVE_COMP_KEY
 
     #ifdef USE_FAST_MATH
         #ifdef NO_RSA
-            /* Custom fastmath size if not using RSA */
-            /* MAX = ROUND32(ECC BITS) * 2 */
+        /* Custom fastmath size if not using RSA */
+        /* MAX = ROUND32(ECC BITS) * 2 */
             #define FP_MAX_BITS     (256 * 2)
         #else
-            #define ALT_ECC_SIZE
+        #define ALT_ECC_SIZE
         #endif
 
         /* Enable TFM optimizations for ECC */
@@ -337,25 +368,25 @@
 /* DH */
 #undef NO_DH
 #if defined(WOLF_CONF_DH) && WOLF_CONF_DH == 1
-    #define HAVE_DH /* freeRTOS settings.h requires this */
-    #define HAVE_FFDHE_2048
-    #define HAVE_DH_DEFAULT_PARAMS
+#define HAVE_DH /* freeRTOS settings.h requires this */
+#define HAVE_FFDHE_2048
+#define HAVE_DH_DEFAULT_PARAMS
 #else
-    #define NO_DH
+#define NO_DH
 #endif
 
 /* AES */
 #if defined(WOLF_CONF_AESGCM) && WOLF_CONF_AESGCM == 1
-    #define HAVE_AESGCM
-    /* GCM Method: GCM_SMALL, GCM_WORD32 or GCM_TABLE */
-    /* GCM_TABLE is about 4K larger and 3x faster */
-    #define GCM_SMALL
-    #define HAVE_AES_DECRYPT
+#define HAVE_AESGCM
+/* GCM Method: GCM_SMALL, GCM_WORD32 or GCM_TABLE */
+/* GCM_TABLE is about 4K larger and 3x faster */
+#define GCM_SMALL
+#define HAVE_AES_DECRYPT
 #endif
 
 #if defined(WOLF_CONF_AESCBC) && WOLF_CONF_AESCBC == 1
-    #define HAVE_AES_CBC
-    #define HAVE_AES_DECRYPT
+#define HAVE_AES_CBC
+#define HAVE_AES_DECRYPT
 #endif
 
 /* Other possible AES modes */
@@ -383,11 +414,11 @@
 #undef HAVE_CURVE25519
 #undef HAVE_ED25519
 #if defined(WOLF_CONF_EDCURVE25519) && WOLF_CONF_EDCURVE25519 == 1
-    #define HAVE_CURVE25519
-    #define HAVE_ED25519
+#define HAVE_CURVE25519
+#define HAVE_ED25519
 
-    /* Optionally use small math (less flash usage, but much slower) */
-    #define CURVED25519_SMALL
+/* Optionally use small math (less flash usage, but much slower) */
+#define CURVED25519_SMALL
 #endif
 
 /* ------------------------------------------------------------------------- */
@@ -399,23 +430,23 @@
     /* 1k smaller, but 25% slower */
     //#define USE_SLOW_SHA
 #else
-    #define NO_SHA
+#define NO_SHA
 #endif
 
 /* Sha2-256 */
 #undef NO_SHA256
 #if defined(WOLF_CONF_SHA2_256) && WOLF_CONF_SHA2_256 == 1
-    /* not unrolled - ~2k smaller and ~25% slower */
-    //#define USE_SLOW_SHA256
+/* not unrolled - ~2k smaller and ~25% slower */
+//#define USE_SLOW_SHA256
 
-    //#define WOLFSSL_SHAKE256
+//#define WOLFSSL_SHAKE256
 
-    /* Sha2-224 */
-    #if defined(WOLF_CONF_SHA2_224) && WOLF_CONF_SHA2_224 == 1
-        #define WOLFSSL_SHA224
-    #endif
+/* Sha2-224 */
+#if defined(WOLF_CONF_SHA2_224) && WOLF_CONF_SHA2_224 == 1
+#define WOLFSSL_SHA224
+#endif
 #else
-    #define NO_SHA256
+#define NO_SHA256
 #endif
 
 /* Sha2-512 */
@@ -424,27 +455,27 @@
     /* over twice as small, but 50% slower */
     //#define USE_SLOW_SHA512
 
-    #define WOLFSSL_SHA512
-    #define HAVE_SHA512 /* freeRTOS settings.h requires this */
+#define WOLFSSL_SHA512
+#define HAVE_SHA512 /* freeRTOS settings.h requires this */
 #endif
 
 /* Sha2-384 */
 #undef WOLFSSL_SHA384
 #if defined(WOLF_CONF_SHA2_384) && WOLF_CONF_SHA2_384 == 1
-    #define WOLFSSL_SHA384
+#define WOLFSSL_SHA384
 #endif
 
 /* Sha3 */
 #undef WOLFSSL_SHA3
 #if defined(WOLF_CONF_SHA3) && WOLF_CONF_SHA3 == 1
-	#define WOLFSSL_SHA3
+#define WOLFSSL_SHA3
 #endif
 
 /* MD5 */
 #if defined(WOLF_CONF_MD5) && WOLF_CONF_MD5 == 1
-	/* enabled */
+    /* enabled */
 #else
-    #define NO_MD5
+#define NO_MD5
 #endif
 
 /* ------------------------------------------------------------------------- */
@@ -459,18 +490,18 @@
 /* Debugging */
 /* ------------------------------------------------------------------------- */
 #if defined(WOLF_CONF_DEBUG) && WOLF_CONF_DEBUG == 1
-    #define DEBUG_WOLFSSL
+#define DEBUG_WOLFSSL
 
-    /* Use this to measure / print heap usage */
-    #if 0
-        #define USE_WOLFSSL_MEMORY
-        #define WOLFSSL_TRACK_MEMORY
-  		  #define WOLFSSL_DEBUG_MEMORY
-	  	  #define WOLFSSL_DEBUG_MEMORY_PRINT
-    #endif
+/* Use this to measure / print heap usage */
+#if 0
+#define USE_WOLFSSL_MEMORY
+#define WOLFSSL_TRACK_MEMORY
+#define WOLFSSL_DEBUG_MEMORY
+#define WOLFSSL_DEBUG_MEMORY_PRINT
+#endif
 #else
-    //#define NO_WOLFSSL_MEMORY
-    //#define NO_ERROR_STRINGS
+//#define NO_WOLFSSL_MEMORY
+//#define NO_ERROR_STRINGS
 #endif
 
 /* ------------------------------------------------------------------------- */
@@ -491,25 +522,25 @@
 /* Disable Features */
 /* ------------------------------------------------------------------------- */
 #if defined(WOLF_CONF_TLS12) && WOLF_CONF_TLS12 == 0
-    #define WOLFSSL_NO_TLS12
+#define WOLFSSL_NO_TLS12
 #endif
 #if defined(WOLF_CONF_WOLFCRYPT_ONLY) && WOLF_CONF_WOLFCRYPT_ONLY == 1
-    #define WOLFCRYPT_ONLY
+#define WOLFCRYPT_ONLY
 #endif
-//#define NO_WOLFSSL_SERVER
-//#define NO_WOLFSSL_CLIENT
+    //#define NO_WOLFSSL_SERVER
+    //#define NO_WOLFSSL_CLIENT
 
 #if defined(WOLF_CONF_TEST) && WOLF_CONF_TEST == 0
-    #define NO_CRYPT_TEST
-    #define NO_CRYPT_BENCHMARK
+#define NO_CRYPT_TEST
+#define NO_CRYPT_BENCHMARK
 #endif
 
-#define NO_FILESYSTEM
+//#define NO_FILESYSTEM
 #define NO_WRITEV
 #define NO_MAIN_DRIVER
 #define NO_DEV_RANDOM
 #define NO_OLD_TLS
-#define WOLFSSL_NO_CLIENT_AUTH /* disable client auth for Ed25519/Ed448 */
+//#define WOLFSSL_NO_CLIENT_AUTH /* disable client auth for Ed25519/Ed448 */
 
 #define NO_DSA
 #define NO_RC4
@@ -518,26 +549,21 @@
 #define NO_MD4
 #define NO_DES3
 
-/* In-lining of misc.c functions */
-/* If defined, must include wolfcrypt/src/misc.c in build */
-/* Slower, but about 1k smaller */
-//#define NO_INLINE
+    /* In-lining of misc.c functions */
+    /* If defined, must include wolfcrypt/src/misc.c in build */
+    /* Slower, but about 1k smaller */
+    //#define NO_INLINE
 
-/* Base16 / Base64 encoding */
-//#define NO_CODING
+    /* Base16 / Base64 encoding */
+    //#define NO_CODING
 
-/* bypass certificate date checking, due to lack of properly configured RTC source */
-#ifndef HAL_RTC_MODULE_ENABLED
-    #define NO_ASN_TIME
-#endif
+    /* bypass certificate date checking, due to lack of properly configured RTC source */
+    // #ifndef HAL_RTC_MODULE_ENABLED
+    //     #define NO_ASN_TIME
+    // #endif
 
 #ifdef __cplusplus
 }
 #endif
 #endif /*__ WOLFSSL_WOLFSSL_CONF_H_H */
 
-/**
-  * @}
-  */
-
-/*****END OF FILE****/
